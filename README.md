@@ -6,15 +6,15 @@ It makes no presumptions about the data schema of claims or attestations to set 
 
 ## Setup: Getting Started
 
-**1. As the Impact Evaluator, create your own impact protocol**
+**1. As the Impact Evaluator, create your own impact methodology**
   1. Create a multisig
   2. Mint a Methodology NFT
 
-**2. As (or on behalf of) a Impact Maker, create a Project NFT**
+**2. As (or on behalf of) a Impact Maker, create a Program NFT**
   1. Create a multisig
-  2. Mint a Project NFT
+  2. Mint a Program NFT
 
-At this point, the Impact Evaluator owns a Protocol NFT and the Impact Maker a Project NFT.
+At this point, the Impact Evaluator owns a Methodology NFT and the Impact Maker a Program NFT.
 
 ## Usage: Evaluating Impact Claims
 
