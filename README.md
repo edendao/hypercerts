@@ -1,27 +1,28 @@
-# foundry-template • [![CI](https://github.com/transmissions11/foundry-template/actions/workflows/tests.yml/badge.svg)](https://github.com/transmissions11/foundry-template/actions/workflows/tests.yml)
+# Hypercerts
 
-Streamlined template for getting started with Foundry and Solmate.
+Hypercerts is omnichain regenerative infrastructure for transparent claims and certifications of impact.
 
-## Contributing
+It makes no presumptions about the data schema of claims or attestations to set the stage for experimentation and standardization of data formats.
 
-You will need a copy of [Foundry](https://github.com/foundry-rs/foundry) installed before proceeding. See the [installation guide](https://github.com/foundry-rs/foundry#installation) for details.
+## Setup: Getting Started
 
-### Setup
+**1. As the Impact Evaluator, create your own impact protocol**
+  1. Create a multisig
+  2. Mint a Methodology NFT
 
-```sh
-git clone https://github.com/transmissions11/foundry-template.git
-cd foundry-template
-forge install
-```
+**2. As (or on behalf of) a Impact Maker, create a Project NFT**
+  1. Create a multisig
+  2. Mint a Project NFT
 
-### Run Tests
+At this point, the Impact Evaluator owns a Protocol NFT and the Impact Maker a Project NFT.
 
-```sh
-forge test
-```
+## Usage: Evaluating Impact Claims
 
-### Update Gas Snapshots
+1. Impact Maker mints a Hypercert NFT
+2. Impact Evaluator reviews Hypercert and mints a Certificate NFT
 
-```sh
-forge snapshot
-```
+A Certificate (NFT) is an evaluation of one of the impact scopes of a Hypercert.
+
+At this point, the Hypercert (NFT) is owned by the Impact Maker and the Certificate by the Impact Evaluator.
+
+*It's that simple!*
