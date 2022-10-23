@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.17;
 
-import {RolesAuthority, Authority} from "solmate/auth/authorities/RolesAuthority.sol";
-import {ERC721} from "solmate/tokens/ERC721.sol";
+import "solmate/auth/authorities/RolesAuthority.sol";
+import "solmate/tokens/ERC721.sol";
 
 contract Domain is ERC721 {
     constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) {}

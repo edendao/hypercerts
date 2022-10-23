@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.17;
 
-import {ERC721} from "solmate/tokens/ERC721.sol";
-import {Domain} from "./mixins/Domain.sol";
+import "solmate/tokens/ERC721.sol";
 
-contract Claim is ERC721 {
+import "./interfaces/IAttestation.sol";
+import "./Domain.sol";
+
+contract Claim is ERC721, IAttestation {
     Domain public programs;
 
     constructor(
@@ -15,7 +17,7 @@ contract Claim is ERC721 {
         programs = Domain(_programs);
     }
 
-    function version() public pure returns (uint16) {
+    function version() public pure virtual override returns (uint16) {
         return 1;
     }
 
@@ -30,18 +32,18 @@ contract Claim is ERC721 {
 
     mapping(uint256 => Metadata) public metadataOf;
 
-    function exists(uint256 id) public view returns (bool) {
+    function exists(uint256 id) public view virtual override returns (bool) {
         return metadataOf[id].agent != address(0);
     }
 
-    function tokenURI(uint256 id) public view override returns (string memory) {
+    function tokenURI(uint256 id) public view virtual override returns (string memory) {
         require(exists(id), "NOT_MINTED");
         return metadataOf[id].uri;
     }
 
     event Attestation(address indexed agent, uint256 indexed programId, uint256 id);
 
-    function attest(bytes calldata data) public payable returns (uint256 id) {
+    function attest(bytes calldata data) public payable virtual override returns (uint256 id) {
         (uint64 startTime, uint64 endTime, string memory claimURI, uint256 programId) = abi.decode(
             data,
             (uint64, uint64, string, uint256)
@@ -67,7 +69,7 @@ contract Claim is ERC721 {
 
     event Withdrawn(address indexed agent, uint256 indexed programId, uint256 id);
 
-    function withdraw(uint256 id) public payable {
+    function withdraw(uint256 id) public payable virtual override {
         Metadata storage c = metadataOf[id];
         require(programs.canCall(msg.sender, c.programId, msg.sig), "UNAUTHORIZED");
 

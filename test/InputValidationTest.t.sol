@@ -1,26 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.17;
 
-import {Test} from "forge-std/Test.sol";
+import "./TestEnvironment.sol";
 
-import {Program} from "src/Program.sol";
-import {Claim} from "src/Claim.sol";
-import {Methodology} from "src/Methodology.sol";
-import {Certificate} from "src/Certificate.sol";
-
-contract InputValidationTest is Test {
-    Program programs = new Program("Impact Program", "iPROGRAM");
-    Claim claims = new Claim("Impact Claim", "iCLAIM", address(programs));
-
-    Methodology methods = new Methodology("Impact Methodology", "iMETHOD");
-    Certificate certs =
-        new Certificate("Impact Certificate", "iCERTIFY", address(claims), address(methods));
-
-    uint256 programId = programs.create("ipfs://test-program");
-    uint256 methodId = methods.create("ipfs://test-methodology");
-    uint256 claimId =
-        claims.attest(abi.encode(uint64(0), uint64(1), "ipfs://test-claim", programId));
-
+contract InputValidationTest is TestEnvironment {
     function testFailProgramCreateEmptyURI() public {
         programs.create("");
     }
@@ -47,27 +30,27 @@ contract InputValidationTest is Test {
     }
 
     function testFailInvalidCertTimeframe() public {
-        certs.attest(abi.encode(uint64(0), uint64(0), 42, "ipfs://cert-1", claimId, methodId));
+        evals.attest(abi.encode(uint64(0), uint64(0), 42, "ipfs://eval-1", claimId, methodId));
     }
 
     function testFailInvalidCertImpactPoints() public {
-        certs.attest(abi.encode(uint64(0), uint64(1), 0, "ipfs://cert-1", claimId, methodId));
+        evals.attest(abi.encode(uint64(0), uint64(1), 0, "ipfs://eval-1", claimId, methodId));
     }
 
     function testFailInvalidCertURI() public {
-        certs.attest(abi.encode(uint64(0), uint64(1), 42, "", claimId, methodId));
+        evals.attest(abi.encode(uint64(0), uint64(1), 42, "", claimId, methodId));
     }
 
     function testFailInvalidCertDuplicateURIs() public {
-        certs.attest(abi.encode(uint64(0), uint64(1), "ipfs://cert-1", methodId));
-        certs.attest(abi.encode(uint64(0), uint64(1), "ipfs://cert-1", methodId));
+        evals.attest(abi.encode(uint64(0), uint64(1), "ipfs://eval-1", methodId));
+        evals.attest(abi.encode(uint64(0), uint64(1), "ipfs://eval-1", methodId));
     }
 
     function testFailInvalidCertClaimID() public {
-        certs.attest(abi.encode(uint64(0), uint64(1), 42, "ipfs://cert-1", claimId + 1, methodId));
+        evals.attest(abi.encode(uint64(0), uint64(1), 42, "ipfs://eval-1", claimId + 1, methodId));
     }
 
     function testFailInvalidCertMethodID() public {
-        certs.attest(abi.encode(uint64(0), uint64(1), 42, "ipfs://cert-1", claimId, methodId + 1));
+        evals.attest(abi.encode(uint64(0), uint64(1), 42, "ipfs://eval-1", claimId, methodId + 1));
     }
 }

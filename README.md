@@ -19,11 +19,11 @@ At this point, the Impact Evaluator owns a Methodology NFT and the Impact Maker 
 ## Usage: Evaluating Impact Claims
 
 1. Impact Maker mints a Hypercert NFT
-2. Impact Evaluator reviews Hypercert and mints a Certificate NFT
+2. Impact Evaluator reviews Hypercert and mints a Evaluation NFT
 
-A Certificate (NFT) is an evaluation of one of the impact scopes of a Hypercert.
+A Evaluation (NFT) is an evaluation of one of the impact scopes of a Hypercert.
 
-At this point, the Hypercert (NFT) is owned by the Impact Maker and the Certificate by the Impact Evaluator.
+At this point, the Hypercert (NFT) is owned by the Impact Maker and the Evaluation by the Impact Evaluator.
 
 *It's that simple!*
 
