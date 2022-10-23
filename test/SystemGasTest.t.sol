@@ -8,7 +8,7 @@ import {Claim} from "src/Claim.sol";
 import {Methodology} from "src/Methodology.sol";
 import {Certificate} from "src/Certificate.sol";
 
-contract GasTest is Test {
+contract SystemGasTest is Test {
     Program programs = new Program("Impact Program", "iPROGRAM");
     Claim claims = new Claim("Impact Claim", "iCLAIM", address(programs));
 
@@ -16,31 +16,25 @@ contract GasTest is Test {
     Certificate certs =
         new Certificate("Impact Certificate", "iCERTIFY", address(claims), address(methods));
 
-    uint256 programId;
-    uint256 methodologyId;
-    uint256 claimId;
-    uint256 certId;
+    uint256 programId = programs.create("ipfs://program-metadata");
+    uint256 methodId = methods.create("ipfs://methodology-metadata");
 
-    function setUp() public {
-        programId = programs.create("ipfs://program-metadata");
-        methodologyId = methods.create("ipfs://methodology-metadata");
+    uint64 startTime = uint64(block.timestamp - 30 days);
+    uint64 endTime = uint64(block.timestamp);
 
-        uint64 startTime = uint64(block.timestamp - 30 days);
-        uint64 endTime = uint64(block.timestamp);
-
-        claimId = claims.create(abi.encode(startTime, endTime, "ipfs://claim-metadata", programId));
-
-        certId = certs.create(
-            abi.encode(startTime, endTime, 42 ether, "ipfs://cert-metadata", claimId, methodologyId)
+    uint256 claimId =
+        claims.attest(abi.encode(startTime, endTime, "ipfs://claim-metadata", programId));
+    uint256 certId =
+        certs.attest(
+            abi.encode(startTime, endTime, 42 ether, "ipfs://cert-metadata", claimId, methodId)
         );
-    }
 
     function testProgramCreateGas() public {
         programs.create("ipfs://program-2-metadata");
     }
 
-    function testCreateClaimGas() public {
-        claims.create(
+    function testClaimAttestGas() public {
+        claims.attest(
             abi.encode(
                 block.timestamp,
                 block.timestamp + 7 days,
@@ -54,20 +48,20 @@ contract GasTest is Test {
         methods.create("ipfs://methodology-2-metadata");
     }
 
-    function testCertCreateGas() public {
-        certs.create(
+    function testCertAttestGas() public {
+        certs.attest(
             abi.encode(
                 block.timestamp + 1 weeks,
                 block.timestamp + 5 weeks,
                 42 ether,
                 "ipfs://cert-2-metadata",
                 claimId,
-                methodologyId
+                methodId
             )
         );
     }
 
-    function testCertRevokeGas() public {
-        certs.revoke(certId);
+    function testCertWithdrawGas() public {
+        certs.withdraw(certId);
     }
 }

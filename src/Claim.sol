@@ -39,9 +39,9 @@ contract Claim is ERC721 {
         return metadataOf[id].uri;
     }
 
-    event Claimed(address indexed agent, uint256 indexed programId, uint256 id);
+    event Attestation(address indexed agent, uint256 indexed programId, uint256 id);
 
-    function create(bytes calldata data) public payable returns (uint256 id) {
+    function attest(bytes calldata data) public payable returns (uint256 id) {
         (uint64 startTime, uint64 endTime, string memory claimURI, uint256 programId) = abi.decode(
             data,
             (uint64, uint64, string, uint256)
@@ -54,7 +54,7 @@ contract Claim is ERC721 {
 
         id = uint256(keccak256(bytes(claimURI)));
         _mint(msg.sender, id);
-        emit Claimed(msg.sender, programId, id);
+        emit Attestation(msg.sender, programId, id);
 
         Metadata storage c = metadataOf[id];
         c.version = version();

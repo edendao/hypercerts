@@ -45,7 +45,7 @@ contract Certificate is ERC721 {
         return metadataOf[id].uri;
     }
 
-    event Certified(
+    event Attestation(
         address indexed agent,
         uint256 indexed methodologyId,
         uint256 indexed claimId,
@@ -54,7 +54,7 @@ contract Certificate is ERC721 {
         string uri
     );
 
-    function create(bytes calldata data) public payable returns (uint256 id) {
+    function attest(bytes calldata data) public payable returns (uint256 id) {
         (
             uint64 startTime,
             uint64 endTime,
@@ -73,7 +73,7 @@ contract Certificate is ERC721 {
 
         id = uint256(keccak256(bytes(certificateURI)));
         _mint(msg.sender, id);
-        emit Certified(msg.sender, methodologyId, claimId, id, impactPoints, certificateURI);
+        emit Attestation(msg.sender, methodologyId, claimId, id, impactPoints, certificateURI);
 
         Metadata storage c = metadataOf[id];
         c.version = version();
@@ -86,19 +86,19 @@ contract Certificate is ERC721 {
         c.uri = certificateURI;
     }
 
-    event Revoked(
+    event Withdrawn(
         address indexed agent,
         uint256 indexed methodologyId,
         uint256 indexed claimId,
         uint256 id
     );
 
-    function revoke(uint256 id) public payable {
+    function withdraw(uint256 id) public payable {
         Metadata storage c = metadataOf[id];
         require(methodologies.canCall(msg.sender, c.methodologyId, msg.sig), "UNAUTHORIZED");
 
         _burn(id);
-        emit Revoked(msg.sender, c.methodologyId, c.claimId, id);
+        emit Withdrawn(msg.sender, c.methodologyId, c.claimId, id);
 
         delete metadataOf[id];
     }

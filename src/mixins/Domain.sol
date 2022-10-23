@@ -1,27 +1,26 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.17;
 
-import {MultiRolesAuthority, Authority} from "solmate/auth/authorities/MultiRolesAuthority.sol";
+import {RolesAuthority, Authority} from "solmate/auth/authorities/RolesAuthority.sol";
 import {ERC721} from "solmate/tokens/ERC721.sol";
 
 contract Domain is ERC721 {
     constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) {}
 
     mapping(uint256 => string) internal _tokenURI;
-    mapping(uint256 => MultiRolesAuthority) public authorityOf;
+    mapping(uint256 => RolesAuthority) public authorityOf;
 
     function canCall(
         address user,
         uint256 domainId,
         bytes4 functionSig
     ) public view virtual returns (bool) {
-        if (user != address(0) && user == _ownerOf[domainId]) return true;
-
-        MultiRolesAuthority a = authorityOf[domainId];
-        return bytes32(0) != a.getUserRoles(user) & a.getRolesWithCapability(functionSig);
+        return
+            user == _ownerOf[domainId] ||
+            authorityOf[domainId].canCall(user, msg.sender, functionSig);
     }
 
-    event AuthorityCreated(uint256 indexed id, MultiRolesAuthority indexed authority);
+    event AuthorityCreated(uint256 indexed id, RolesAuthority authority);
 
     function create(string memory uri) public virtual returns (uint256 id) {
         require(bytes(uri).length > 0, "INVALID_URI");
@@ -31,7 +30,7 @@ contract Domain is ERC721 {
         _mint(msg.sender, id);
         _tokenURI[id] = uri;
 
-        authorityOf[id] = new MultiRolesAuthority(msg.sender, Authority(address(0)));
+        authorityOf[id] = new RolesAuthority(msg.sender, Authority(address(0)));
         emit AuthorityCreated(id, authorityOf[id]);
     }
 
@@ -53,9 +52,9 @@ contract Domain is ERC721 {
         _tokenURI[id] = uri;
     }
 
-    event AuthorityUpdated(uint256 indexed id, Authority authority);
+    event AuthorityUpdated(uint256 indexed id, RolesAuthority authority);
 
-    function setAuthority(uint256 id, MultiRolesAuthority authority) public onlyTokenOwner(id) {
+    function setAuthority(uint256 id, RolesAuthority authority) public onlyTokenOwner(id) {
         authorityOf[id] = authority;
         emit AuthorityUpdated(id, authority);
     }
