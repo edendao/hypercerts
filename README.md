@@ -26,3 +26,8 @@ A Certificate (NFT) is an evaluation of one of the impact scopes of a Hypercert.
 At this point, the Hypercert (NFT) is owned by the Impact Maker and the Certificate by the Impact Evaluator.
 
 *It's that simple!*
+
+## TODO
+
+1. Make contracts upgradeable
+2. Deployment script

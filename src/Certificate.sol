@@ -23,23 +23,9 @@ contract Certificate is ERC721 {
         return 1;
     }
 
-    function tokenURI(uint256 id) public view override returns (string memory) {
-        require(metadataOf[id].minter != address(0), "NOT_MINTED");
-        return metadataOf[id].uri;
-    }
-
-    event Certified(
-        address indexed minter,
-        uint256 indexed methodologyId,
-        uint256 indexed claimId,
-        uint256 id,
-        uint128 impactPoints,
-        string uri
-    );
-
     struct Metadata {
         uint16 version;
-        address minter;
+        address agent;
         uint64 startTime;
         uint64 endTime;
         uint128 impactPoints;
@@ -49,6 +35,24 @@ contract Certificate is ERC721 {
     }
 
     mapping(uint256 => Metadata) public metadataOf;
+
+    function exists(uint256 id) public view returns (bool) {
+        return metadataOf[id].agent != address(0);
+    }
+
+    function tokenURI(uint256 id) public view override returns (string memory) {
+        require(exists(id), "NOT_MINTED");
+        return metadataOf[id].uri;
+    }
+
+    event Certified(
+        address indexed agent,
+        uint256 indexed methodologyId,
+        uint256 indexed claimId,
+        uint256 id,
+        uint128 impactPoints,
+        string uri
+    );
 
     function create(bytes calldata data) public payable returns (uint256 id) {
         (
@@ -66,13 +70,13 @@ contract Certificate is ERC721 {
         require(startTime < endTime, "INVALID_TIMEFRAME");
         require(bytes(certificateURI).length > 0, "INVALID_URI");
 
-        id = uint256(keccak256(abi.encode(methodologyId, claimId, startTime, endTime)));
+        id = uint256(keccak256(bytes(certificateURI)));
         _mint(msg.sender, id);
         emit Certified(msg.sender, methodologyId, claimId, id, impactPoints, certificateURI);
 
         Metadata storage c = metadataOf[id];
         c.version = version();
-        c.minter = msg.sender;
+        c.agent = msg.sender;
         c.startTime = startTime;
         c.endTime = endTime;
         c.impactPoints = impactPoints;
@@ -81,12 +85,19 @@ contract Certificate is ERC721 {
         c.uri = certificateURI;
     }
 
+    event Revoked(
+        address indexed agent,
+        uint256 indexed methodologyId,
+        uint256 indexed claimId,
+        uint256 id
+    );
+
     function revoke(uint256 id) public payable {
         Metadata storage c = metadataOf[id];
         require(methodologies.canCall(msg.sender, c.methodologyId, msg.sig), "UNAUTHORIZED");
 
         _burn(id);
-        emit Certified(msg.sender, c.methodologyId, c.claimId, id, 0, "");
+        emit Revoked(msg.sender, c.methodologyId, c.claimId, id);
 
         delete metadataOf[id];
     }

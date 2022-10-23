@@ -8,7 +8,7 @@ import {Claim} from "src/Claim.sol";
 import {Methodology} from "src/Methodology.sol";
 import {Certificate} from "src/Certificate.sol";
 
-contract SystemTest is Test {
+contract GasTest is Test {
     Program programs = new Program("Impact Program", "iPROGRAM");
     Claim claims = new Claim("Impact Claim", "iCLAIM", address(programs));
 
@@ -36,7 +36,7 @@ contract SystemTest is Test {
     }
 
     function testProgramCreateGas() public {
-        programs.create("ipfs://another-program-metadata");
+        programs.create("ipfs://program-2-metadata");
     }
 
     function testCreateClaimGas() public {
@@ -51,7 +51,7 @@ contract SystemTest is Test {
     }
 
     function testMethodologyCreateGas() public {
-        methodologies.create("ipfs://another-program-metadata");
+        methodologies.create("ipfs://methodology-2-metadata");
     }
 
     function testCertCreateGas() public {
@@ -60,7 +60,7 @@ contract SystemTest is Test {
                 block.timestamp + 1 weeks,
                 block.timestamp + 5 weeks,
                 42 ether,
-                "ipfs://cert-metadata",
+                "ipfs://cert-2-metadata",
                 claimId,
                 methodologyId
             )

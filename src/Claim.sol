@@ -19,26 +19,27 @@ contract Claim is ERC721 {
         return 1;
     }
 
-    function exists(uint256 id) public view virtual returns (bool) {
-        return metadataOf[id].minter != address(0);
-    }
-
-    function tokenURI(uint256 id) public view override returns (string memory) {
-        require(metadataOf[id].minter != address(0), "NOT_MINTED");
-        return metadataOf[id].uri;
-    }
-
-    event Claimed(address indexed minter, uint256 indexed programId, uint256 id);
-
     struct Metadata {
         uint16 version;
-        address minter;
+        address agent;
         uint64 startTime;
         uint64 endTime;
+        uint256 programId;
         string uri;
     }
 
     mapping(uint256 => Metadata) public metadataOf;
+
+    function exists(uint256 id) public view returns (bool) {
+        return metadataOf[id].agent != address(0);
+    }
+
+    function tokenURI(uint256 id) public view override returns (string memory) {
+        require(exists(id), "NOT_MINTED");
+        return metadataOf[id].uri;
+    }
+
+    event Claimed(address indexed agent, uint256 indexed programId, uint256 id);
 
     function create(bytes calldata data) public payable returns (uint256 id) {
         (uint64 startTime, uint64 endTime, string memory claimURI, uint256 programId) = abi.decode(
@@ -56,9 +57,22 @@ contract Claim is ERC721 {
 
         Metadata storage c = metadataOf[id];
         c.version = version();
-        c.minter = msg.sender;
+        c.agent = msg.sender;
         c.startTime = startTime;
         c.endTime = endTime;
+        c.programId = programId;
         c.uri = claimURI;
+    }
+
+    event Withdrawn(address indexed agent, uint256 indexed programId, uint256 id);
+
+    function withdraw(uint256 id) public {
+        Metadata storage c = metadataOf[id];
+        require(programs.canCall(msg.sender, c.programId, msg.sig), "UNAUTHORIZED");
+
+        _burn(id);
+        emit Withdrawn(c.agent, c.programId, id);
+
+        delete metadataOf[id];
     }
 }
