@@ -35,7 +35,7 @@ contract DomainAuthorityTest is TestEnvironment {
     }
 
     function testMethodAuthority() public {
-        assertEq(address(methods.authorityOf(methodId)), address(methodAuthority));
+        assertEq(address(domains.authorityOf(domainId)), address(methodAuthority));
         uint256 claimId = claims.attest(
             abi.encode(startTime, endTime, "ipfs://claim-metadata", programId)
         );
@@ -44,17 +44,17 @@ contract DomainAuthorityTest is TestEnvironment {
         changePrank(methodUser);
         vm.expectRevert("UNAUTHORIZED");
         evals.attest(
-            abi.encode(startTime, endTime, 42 ether, "ipfs://eval-metadata", claimId, methodId)
+            abi.encode(startTime, endTime, 42 ether, "ipfs://eval-metadata", claimId, domainId)
         );
 
         changePrank(self);
-        RolesAuthority r = methods.authorityOf(methodId);
+        RolesAuthority r = domains.authorityOf(domainId);
         r.setRoleCapability(0, address(evals), evals.attest.selector, true);
         r.setUserRole(methodUser, 0, true);
 
         changePrank(methodUser);
         uint256 id = evals.attest(
-            abi.encode(startTime, endTime, 42 ether, "ipfs://eval-metadata", claimId, methodId)
+            abi.encode(startTime, endTime, 42 ether, "ipfs://eval-metadata", claimId, domainId)
         );
         assertTrue(evals.exists(id));
 

@@ -20,7 +20,7 @@ contract SystemGasTest is TestEnvironment {
     }
 
     function testMethodologyCreateGas() public {
-        methods.create("ipfs://methodology-2-metadata");
+        domains.create("ipfs://methodology-2-metadata");
     }
 
     function testCertAttestGas() public {
@@ -31,7 +31,7 @@ contract SystemGasTest is TestEnvironment {
                 42 ether,
                 "ipfs://eval-2-metadata",
                 claimId,
-                methodId
+                domainId
             )
         );
     }

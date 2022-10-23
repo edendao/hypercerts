@@ -11,27 +11,27 @@ contract Pool is ERC20 {
     uint16 public constant version = 1;
     uint64 public immutable startTime;
     uint64 public immutable endTime;
-    uint256 public immutable methodId;
+    uint256 public immutable domainId;
 
-    Evaluation public immutable evaluations;
+    Domain public immutable domain;
     Claim public immutable claims;
-    Domain public immutable methods;
+    Evaluation public immutable evaluations;
 
     constructor(
         string memory _name,
         string memory _symbol,
         uint64 _startTime,
         uint64 _endTime,
-        uint256 _methodId,
+        uint256 _domainId,
         address _evaluations
     ) ERC20(_name, _symbol, 18) {
         startTime = _startTime;
         endTime = _endTime;
-        methodId = _methodId;
+        domainId = _domainId;
 
         evaluations = Evaluation(_evaluations);
         claims = evaluations.claims();
-        methods = evaluations.methods();
+        domain = evaluations.domain();
     }
 
     modifier nonReentrant() {
@@ -49,11 +49,11 @@ contract Pool is ERC20 {
             uint64 evalEndTime,
             uint128 evalValue,
             uint256 evalClaimId,
-            uint256 evalMethodId,
+            uint256 evalDomainId,
 
         ) = evaluations.metadataOf(evaluationId);
         require(version == evalVersion, "INVALID_VERSION");
-        require(methodId == evalMethodId, "INVALID_METHOD");
+        require(domainId == evalDomainId, "INVALID_DOMAIN");
         require(startTime <= evalStartTime && evalEndTime <= endTime, "INVALID_TIMEFRAME");
 
         _mint(account, uint256(evalValue));
