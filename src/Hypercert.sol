@@ -28,7 +28,7 @@ contract Hypercert is ERC721, IAttestation {
         uint64 startTime;
         uint64 endTime;
         uint128 value;
-        uint256 subjectId;
+        uint256 linkedId;
         uint256 domainId;
         string uri;
     }
@@ -47,7 +47,7 @@ contract Hypercert is ERC721, IAttestation {
     event Attestation(
         address indexed agent,
         uint256 indexed domainId,
-        uint256 indexed subjectId,
+        uint256 indexed linkedId,
         uint256 hypercertId,
         uint128 value,
         string uri
@@ -65,19 +65,19 @@ contract Hypercert is ERC721, IAttestation {
             uint64 endTime,
             uint128 value,
             string memory uri,
-            uint256 subjectId,
+            uint256 linkedId,
             uint256 domainId
         ) = abi.decode(data, (uint64, uint64, uint128, string, uint256, uint256));
 
         require(startTime < endTime, "INVALID_TIMEFRAME");
         require(bytes(uri).length > 0, "INVALID_URI");
 
-        require(subjectId == 0 || exists(subjectId), "INVALID_SUBJECT");
+        require(linkedId == 0 || exists(linkedId), "INVALID_SUBJECT");
         require(domains.canCall(msg.sender, domainId, msg.sig), "UNAUTHORIZED");
 
         hypercertId = uint256(keccak256(bytes(uri)));
         _mint(msg.sender, hypercertId);
-        emit Attestation(msg.sender, domainId, subjectId, hypercertId, value, uri);
+        emit Attestation(msg.sender, domainId, linkedId, hypercertId, value, uri);
 
         Metadata storage c = metadataOf[hypercertId];
         c.version = version();
@@ -86,14 +86,14 @@ contract Hypercert is ERC721, IAttestation {
         c.endTime = endTime;
         c.value = value;
         c.domainId = domainId;
-        c.subjectId = subjectId;
+        c.linkedId = linkedId;
         c.uri = uri;
     }
 
     event Withdrawn(
         address indexed agent,
         uint256 indexed domainId,
-        uint256 indexed subjectId,
+        uint256 indexed linkedId,
         uint256
     );
 
@@ -102,7 +102,7 @@ contract Hypercert is ERC721, IAttestation {
         require(domains.canCall(msg.sender, c.domainId, msg.sig), "UNAUTHORIZED");
 
         _burn(hypercertId);
-        emit Withdrawn(msg.sender, c.domainId, c.subjectId, hypercertId);
+        emit Withdrawn(msg.sender, c.domainId, c.linkedId, hypercertId);
 
         delete metadataOf[hypercertId];
     }
