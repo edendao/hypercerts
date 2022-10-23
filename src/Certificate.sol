@@ -2,10 +2,12 @@
 pragma solidity ^0.8.17;
 
 import {ERC721} from "solmate/tokens/ERC721.sol";
+import {Domain} from "./mixins/Domain.sol";
+import {Claim} from "./Claim.sol";
 
 contract Certificate is ERC721 {
-    ERC721 public claims;
-    ERC721 public methodologies;
+    Claim public claims;
+    Domain public methodologies;
 
     constructor(
         string memory _name,
@@ -13,8 +15,8 @@ contract Certificate is ERC721 {
         address _claims,
         address _methodologies
     ) ERC721(_name, _symbol) {
-        claims = ERC721(_claims);
-        methodologies = ERC721(_methodologies);
+        claims = Claim(_claims);
+        methodologies = Domain(_methodologies);
     }
 
     function version() public pure returns (uint16) {
@@ -58,8 +60,8 @@ contract Certificate is ERC721 {
             uint256 methodologyId
         ) = abi.decode(data, (uint64, uint64, uint128, string, uint256, uint256));
 
-        require(methodologies.ownerOf(methodologyId) == msg.sender, "UNAUTHORIZED");
-        require(claims.ownerOf(claimId) != address(0), "INVALID_CLAIM");
+        require(methodologies.canCall(msg.sender, methodologyId, msg.sig), "UNAUTHORIZED");
+        require(claims.exists(claimId), "INVALID_CLAIM");
         require(impactPoints != 0, "INVALID_POINTS");
         require(startTime < endTime, "INVALID_TIMEFRAME");
         require(bytes(certificateURI).length > 0, "INVALID_URI");
@@ -81,7 +83,7 @@ contract Certificate is ERC721 {
 
     function revoke(uint256 id) public payable {
         Metadata storage c = metadataOf[id];
-        require(methodologies.ownerOf(c.methodologyId) == msg.sender, "UNAUTHORIZED");
+        require(methodologies.canCall(msg.sender, c.methodologyId, msg.sig), "UNAUTHORIZED");
 
         _burn(id);
         emit Certified(msg.sender, c.methodologyId, c.claimId, id, 0, "");

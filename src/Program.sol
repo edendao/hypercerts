@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.17;
 
-import {ERC721URIStorage} from "./mixins/ERC721URIStorage.sol";
+import {Domain} from "./mixins/Domain.sol";
 
-contract Program is ERC721URIStorage {
-    constructor(string memory _name, string memory _symbol) ERC721URIStorage(_name, _symbol) {}
+contract Program is Domain {
+    constructor(string memory _name, string memory _symbol) Domain(_name, _symbol) {}
 }

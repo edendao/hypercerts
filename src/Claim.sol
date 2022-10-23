@@ -2,20 +2,25 @@
 pragma solidity ^0.8.17;
 
 import {ERC721} from "solmate/tokens/ERC721.sol";
+import {Domain} from "./mixins/Domain.sol";
 
 contract Claim is ERC721 {
-    ERC721 public programs;
+    Domain public programs;
 
     constructor(
         string memory _name,
         string memory _symbol,
         address _programs
     ) ERC721(_name, _symbol) {
-        programs = ERC721(_programs);
+        programs = Domain(_programs);
     }
 
     function version() public pure returns (uint16) {
         return 1;
+    }
+
+    function exists(uint256 id) public view virtual returns (bool) {
+        return metadataOf[id].minter != address(0);
     }
 
     function tokenURI(uint256 id) public view override returns (string memory) {
@@ -41,7 +46,7 @@ contract Claim is ERC721 {
             (uint64, uint64, string, uint256)
         );
 
-        require(programs.ownerOf(programId) == msg.sender, "UNAUTHORIZED");
+        require(programs.canCall(msg.sender, programId, msg.sig), "UNAUTHORIZED");
         require(startTime < endTime, "INVALID_TIMEFRAME");
         require(bytes(claimURI).length > 0, "INVALID_URI");
 
