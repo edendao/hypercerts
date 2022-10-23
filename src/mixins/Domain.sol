@@ -24,6 +24,8 @@ contract Domain is ERC721 {
     event AuthorityCreated(uint256 indexed id, MultiRolesAuthority indexed authority);
 
     function create(string memory uri) public virtual returns (uint256 id) {
+        require(bytes(uri).length > 0, "INVALID_URI");
+
         id = uint256(keccak256(bytes(uri)));
 
         _mint(msg.sender, id);

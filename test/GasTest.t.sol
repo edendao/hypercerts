@@ -12,9 +12,9 @@ contract GasTest is Test {
     Program programs = new Program("Impact Program", "iPROGRAM");
     Claim claims = new Claim("Impact Claim", "iCLAIM", address(programs));
 
-    Methodology methodologies = new Methodology("Impact Methodology", "iMETHOD");
+    Methodology methods = new Methodology("Impact Methodology", "iMETHOD");
     Certificate certs =
-        new Certificate("Impact Certificate", "iCERTIFY", address(claims), address(methodologies));
+        new Certificate("Impact Certificate", "iCERTIFY", address(claims), address(methods));
 
     uint256 programId;
     uint256 methodologyId;
@@ -23,7 +23,7 @@ contract GasTest is Test {
 
     function setUp() public {
         programId = programs.create("ipfs://program-metadata");
-        methodologyId = methodologies.create("ipfs://methodology-metadata");
+        methodologyId = methods.create("ipfs://methodology-metadata");
 
         uint64 startTime = uint64(block.timestamp - 30 days);
         uint64 endTime = uint64(block.timestamp);
@@ -51,7 +51,7 @@ contract GasTest is Test {
     }
 
     function testMethodologyCreateGas() public {
-        methodologies.create("ipfs://methodology-2-metadata");
+        methods.create("ipfs://methodology-2-metadata");
     }
 
     function testCertCreateGas() public {

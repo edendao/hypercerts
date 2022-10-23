@@ -64,11 +64,12 @@ contract Certificate is ERC721 {
             uint256 methodologyId
         ) = abi.decode(data, (uint64, uint64, uint128, string, uint256, uint256));
 
+        require(startTime < endTime, "INVALID_TIMEFRAME");
+        require(impactPoints != 0, "INVALID_POINTS");
+        require(bytes(certificateURI).length > 0, "INVALID_URI");
+
         require(methodologies.canCall(msg.sender, methodologyId, msg.sig), "UNAUTHORIZED");
         require(claims.exists(claimId), "INVALID_CLAIM");
-        require(impactPoints != 0, "INVALID_POINTS");
-        require(startTime < endTime, "INVALID_TIMEFRAME");
-        require(bytes(certificateURI).length > 0, "INVALID_URI");
 
         id = uint256(keccak256(bytes(certificateURI)));
         _mint(msg.sender, id);

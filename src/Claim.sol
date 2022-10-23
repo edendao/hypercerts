@@ -47,9 +47,10 @@ contract Claim is ERC721 {
             (uint64, uint64, string, uint256)
         );
 
-        require(programs.canCall(msg.sender, programId, msg.sig), "UNAUTHORIZED");
         require(startTime < endTime, "INVALID_TIMEFRAME");
         require(bytes(claimURI).length > 0, "INVALID_URI");
+
+        require(programs.canCall(msg.sender, programId, msg.sig), "UNAUTHORIZED");
 
         id = uint256(keccak256(bytes(claimURI)));
         _mint(msg.sender, id);
