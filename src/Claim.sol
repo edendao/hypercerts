@@ -67,7 +67,7 @@ contract Claim is ERC721 {
 
     event Withdrawn(address indexed agent, uint256 indexed programId, uint256 id);
 
-    function withdraw(uint256 id) public {
+    function withdraw(uint256 id) public payable {
         Metadata storage c = metadataOf[id];
         require(programs.canCall(msg.sender, c.programId, msg.sig), "UNAUTHORIZED");
 

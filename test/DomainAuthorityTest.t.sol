@@ -10,6 +10,14 @@ import {Claim} from "src/Claim.sol";
 import {Methodology} from "src/Methodology.sol";
 import {Certificate} from "src/Certificate.sol";
 
+interface IAttestation {
+    function exists(uint256 id) external view returns (bool);
+
+    function attest(bytes calldata data) external payable returns (uint256 id);
+
+    function withdraw(uint256 id) external payable;
+}
+
 contract DomainAuthorityTest is Test {
     address owner = address(this);
 
@@ -20,72 +28,52 @@ contract DomainAuthorityTest is Test {
     Certificate certs =
         new Certificate("Impact Certificate", "iCERTIFY", address(claims), address(methods));
 
-    uint256 programId = programs.create("ipfs://program-metadata");
-    uint256 methodId = methods.create("ipfs://methodology-metadata");
+    uint256 programId;
+    RolesAuthority programAuthority;
 
-    uint64 startTime = uint64(block.timestamp - 30 days);
-    uint64 endTime = uint64(block.timestamp);
+    uint256 methodId;
+    RolesAuthority methodAuthority;
 
-    function testProgramOwnerCanAuthorizeUsers() public {
-        address programUser = makeAddr("programUser");
-
-        changePrank(programUser);
-        vm.expectRevert("UNAUTHORIZED");
-        claims.attest(abi.encode(startTime, endTime, "ipfs://claim-metadata", programId));
-
-        changePrank(owner);
-        RolesAuthority r = programs.authorityOf(programId);
-        r.setRoleCapability(0, address(claims), claims.attest.selector, true);
-        r.setUserRole(programUser, 0, true);
-
-        changePrank(programUser);
-        uint256 id = claims.attest(
-            abi.encode(startTime, endTime, "ipfs://claim-metadata", programId)
-        );
-        assertTrue(claims.exists(id));
-
-        vm.expectRevert("UNAUTHORIZED");
-        claims.withdraw(id);
-
-        changePrank(owner);
-        r.setRoleCapability(0, address(claims), claims.withdraw.selector, true);
-
-        changePrank(programUser);
-        claims.withdraw(id);
-        assertFalse(claims.exists(id));
+    function setUp() public {
+        (programId, programAuthority) = programs.create("ipfs://program-metadata");
+        (methodId, methodAuthority) = methods.create("ipfs://methodology-metadata");
     }
 
-    function testMethodOwnerCanAuthorizeUsers() public {
-        uint256 claimId = claims.attest(
-            abi.encode(startTime, endTime, "ipfs://claim-metadata", programId)
-        );
-        address methodUser = makeAddr("methodUser");
+    function testMethodAuthority() public {
+        assertEq(address(methods.authorityOf(methodId)), address(methodAuthority));
+        _testAuthority(IAttestation(address(methodAuthority)));
+    }
 
-        changePrank(methodUser);
+    function testProgramAuthority() public {
+        assertEq(address(programs.authorityOf(programId)), address(programAuthority));
+        _testAuthority(IAttestation(address(programAuthority)));
+    }
+
+    function _testAuthority(IAttestation i) internal {
+        address authorizedUser = makeAddr("authorizedUser");
+        uint64 startTime = uint64(block.timestamp - 30 days);
+        uint64 endTime = uint64(block.timestamp);
+
+        changePrank(authorizedUser);
         vm.expectRevert("UNAUTHORIZED");
-        certs.attest(
-            abi.encode(startTime, endTime, 42 ether, "ipfs://cert-metadata", claimId, methodId)
-        );
+        i.attest(abi.encode(startTime, endTime, "ipfs://claim-metadata", programId));
 
         changePrank(owner);
-        RolesAuthority r = methods.authorityOf(methodId);
-        r.setRoleCapability(0, address(certs), certs.attest.selector, true);
-        r.setUserRole(methodUser, 0, true);
+        programAuthority.setRoleCapability(0, address(i), i.attest.selector, true);
+        programAuthority.setUserRole(authorizedUser, 0, true);
 
-        changePrank(methodUser);
-        uint256 id = certs.attest(
-            abi.encode(startTime, endTime, 42 ether, "ipfs://cert-metadata", claimId, methodId)
-        );
-        assertTrue(certs.exists(id));
+        changePrank(authorizedUser);
+        uint256 id = i.attest(abi.encode(startTime, endTime, "ipfs://claim-metadata", programId));
+        assertTrue(i.exists(id));
 
         vm.expectRevert("UNAUTHORIZED");
-        certs.withdraw(id);
+        i.withdraw(id);
 
         changePrank(owner);
-        r.setRoleCapability(0, address(certs), certs.withdraw.selector, true);
+        programAuthority.setRoleCapability(0, address(i), i.withdraw.selector, true);
 
-        changePrank(methodUser);
-        certs.withdraw(id);
-        assertFalse(certs.exists(id));
+        changePrank(authorizedUser);
+        i.withdraw(id);
+        assertFalse(i.exists(id));
     }
 }

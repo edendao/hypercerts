@@ -8,6 +8,7 @@ contract Domain is ERC721 {
     constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) {}
 
     mapping(uint256 => string) internal _tokenURI;
+
     mapping(uint256 => RolesAuthority) public authorityOf;
 
     function canCall(
@@ -20,9 +21,9 @@ contract Domain is ERC721 {
             authorityOf[domainId].canCall(user, msg.sender, functionSig);
     }
 
-    event AuthorityCreated(uint256 indexed id, RolesAuthority authority);
+    event AuthorityUpdated(uint256 indexed id, RolesAuthority authority);
 
-    function create(string memory uri) public virtual returns (uint256 id) {
+    function create(string memory uri) public virtual returns (uint256 id, RolesAuthority a) {
         require(bytes(uri).length > 0, "INVALID_URI");
 
         id = uint256(keccak256(bytes(uri)));
@@ -30,12 +31,10 @@ contract Domain is ERC721 {
         _mint(msg.sender, id);
         _tokenURI[id] = uri;
 
-        authorityOf[id] = new RolesAuthority(msg.sender, Authority(address(0)));
-        emit AuthorityCreated(id, authorityOf[id]);
-    }
+        a = new RolesAuthority(msg.sender, Authority(address(0)));
 
-    function tokenURI(uint256 id) public view override returns (string memory) {
-        return _tokenURI[id];
+        authorityOf[id] = a;
+        emit AuthorityUpdated(id, a);
     }
 
     modifier onlyTokenOwner(uint256 id) {
@@ -48,14 +47,16 @@ contract Domain is ERC721 {
         delete _tokenURI[id];
     }
 
+    function setAuthority(uint256 id, RolesAuthority authority) public onlyTokenOwner(id) {
+        authorityOf[id] = authority;
+        emit AuthorityUpdated(id, authority);
+    }
+
     function setTokenURI(uint256 id, string memory uri) public virtual onlyTokenOwner(id) {
         _tokenURI[id] = uri;
     }
 
-    event AuthorityUpdated(uint256 indexed id, RolesAuthority authority);
-
-    function setAuthority(uint256 id, RolesAuthority authority) public onlyTokenOwner(id) {
-        authorityOf[id] = authority;
-        emit AuthorityUpdated(id, authority);
+    function tokenURI(uint256 id) public view override returns (string memory) {
+        return _tokenURI[id];
     }
 }
