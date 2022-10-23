@@ -33,7 +33,7 @@ contract InputValidationTest is TestEnvironment {
         evals.attest(abi.encode(uint64(0), uint64(0), 42, "ipfs://eval-1", claimId, methodId));
     }
 
-    function testFailInvalidCertImpactPoints() public {
+    function testFailInvalidCertvalue() public {
         evals.attest(abi.encode(uint64(0), uint64(1), 0, "ipfs://eval-1", claimId, methodId));
     }
 

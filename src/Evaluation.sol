@@ -30,7 +30,7 @@ contract Evaluation is ERC721, IAttestation {
         address agent;
         uint64 startTime;
         uint64 endTime;
-        uint128 impactPoints;
+        uint128 value;
         uint256 claimId;
         uint256 methodId;
         string uri;
@@ -52,7 +52,7 @@ contract Evaluation is ERC721, IAttestation {
         uint256 indexed methodId,
         uint256 indexed claimId,
         uint256 id,
-        uint128 impactPoints,
+        uint128 value,
         string uri
     );
 
@@ -60,14 +60,14 @@ contract Evaluation is ERC721, IAttestation {
         (
             uint64 startTime,
             uint64 endTime,
-            uint128 impactPoints,
+            uint128 value,
             string memory evaluationURI,
             uint256 claimId,
             uint256 methodId
         ) = abi.decode(data, (uint64, uint64, uint128, string, uint256, uint256));
 
         require(startTime < endTime, "INVALID_TIMEFRAME");
-        require(impactPoints != 0, "INVALID_POINTS");
+        require(value != 0, "INVALID_POINTS");
         require(bytes(evaluationURI).length > 0, "INVALID_URI");
 
         require(methods.canCall(msg.sender, methodId, msg.sig), "UNAUTHORIZED");
@@ -75,14 +75,14 @@ contract Evaluation is ERC721, IAttestation {
 
         id = uint256(keccak256(bytes(evaluationURI)));
         _mint(msg.sender, id);
-        emit Attestation(msg.sender, methodId, claimId, id, impactPoints, evaluationURI);
+        emit Attestation(msg.sender, methodId, claimId, id, value, evaluationURI);
 
         Metadata storage c = metadataOf[id];
         c.version = version();
         c.agent = msg.sender;
         c.startTime = startTime;
         c.endTime = endTime;
-        c.impactPoints = impactPoints;
+        c.value = value;
         c.methodId = methodId;
         c.claimId = claimId;
         c.uri = evaluationURI;

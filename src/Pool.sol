@@ -35,7 +35,7 @@ contract Pool is ERC20 {
     }
 
     modifier nonReentrant() {
-        require(!_reentrancyGuard, "REENTRANT");
+        require(!_reentrancyGuard, "REENTRANCY");
         _reentrancyGuard = true;
         _;
         _reentrancyGuard = false;
@@ -47,7 +47,7 @@ contract Pool is ERC20 {
             ,
             uint64 evalStartTime,
             uint64 evalEndTime,
-            uint128 evalImpactPoints,
+            uint128 evalValue,
             uint256 evalClaimId,
             uint256 evalMethodId,
 
@@ -56,18 +56,16 @@ contract Pool is ERC20 {
         require(methodId == evalMethodId, "INVALID_METHOD");
         require(startTime <= evalStartTime && evalEndTime <= endTime, "INVALID_TIMEFRAME");
 
-        _mint(account, uint256(evalImpactPoints));
+        _mint(account, uint256(evalValue));
 
         claims.transferFrom(account, address(this), evalClaimId);
         evaluations.transferFrom(address(this), account, evaluationId);
     }
 
     function reclaim(uint256 evaluationId, address account) public payable virtual nonReentrant {
-        (, , , , uint128 evalImpactPoints, uint256 evalClaimId, , ) = evaluations.metadataOf(
-            evaluationId
-        );
+        (, , , , uint128 evalValue, uint256 evalClaimId, , ) = evaluations.metadataOf(evaluationId);
 
-        _burn(account, uint256(evalImpactPoints));
+        _burn(account, uint256(evalValue));
 
         claims.transferFrom(address(this), account, evalClaimId);
         evaluations.transferFrom(account, address(this), evaluationId);
