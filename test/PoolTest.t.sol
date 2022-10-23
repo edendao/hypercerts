@@ -16,7 +16,7 @@ contract PoolTest is TestEnvironment {
             "iPOOL",
             startTime - 30 days,
             endTime + 30 days,
-            domainId,
+            methodId,
             address(evals)
         );
 

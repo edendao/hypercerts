@@ -9,7 +9,7 @@ contract InputValidationTest is TestEnvironment {
     }
 
     function testFailMethodologyCreateEmptyURI() public {
-        domains.create("");
+        methods.create("");
     }
 
     function testFailInvalidClaimTimeframe() public {
@@ -30,27 +30,27 @@ contract InputValidationTest is TestEnvironment {
     }
 
     function testFailInvalidCertTimeframe() public {
-        evals.attest(abi.encode(uint64(0), uint64(0), 42, "ipfs://eval-1", claimId, domainId));
+        evals.attest(abi.encode(uint64(0), uint64(0), 42, "ipfs://eval-1", claimId, methodId));
     }
 
     function testFailInvalidCertvalue() public {
-        evals.attest(abi.encode(uint64(0), uint64(1), 0, "ipfs://eval-1", claimId, domainId));
+        evals.attest(abi.encode(uint64(0), uint64(1), 0, "ipfs://eval-1", claimId, methodId));
     }
 
     function testFailInvalidCertURI() public {
-        evals.attest(abi.encode(uint64(0), uint64(1), 42, "", claimId, domainId));
+        evals.attest(abi.encode(uint64(0), uint64(1), 42, "", claimId, methodId));
     }
 
     function testFailInvalidCertDuplicateURIs() public {
-        evals.attest(abi.encode(uint64(0), uint64(1), "ipfs://eval-1", domainId));
-        evals.attest(abi.encode(uint64(0), uint64(1), "ipfs://eval-1", domainId));
+        evals.attest(abi.encode(uint64(0), uint64(1), "ipfs://eval-1", methodId));
+        evals.attest(abi.encode(uint64(0), uint64(1), "ipfs://eval-1", methodId));
     }
 
     function testFailInvalidCertClaimID() public {
-        evals.attest(abi.encode(uint64(0), uint64(1), 42, "ipfs://eval-1", claimId + 1, domainId));
+        evals.attest(abi.encode(uint64(0), uint64(1), 42, "ipfs://eval-1", claimId + 1, methodId));
     }
 
-    function testFailInvalidCertDomainId() public {
-        evals.attest(abi.encode(uint64(0), uint64(1), 42, "ipfs://eval-1", claimId, domainId + 1));
+    function testFailInvalidCertMethodId() public {
+        evals.attest(abi.encode(uint64(0), uint64(1), 42, "ipfs://eval-1", claimId, methodId + 1));
     }
 }
