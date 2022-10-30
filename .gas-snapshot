@@ -1,5 +1,5 @@
-DomainAuthorityTest:testMethodAuthority() (gas: 371601)
-DomainAuthorityTest:testProgramAuthority() (gas: 239079)
+HyperspaceAuthorityTest:testMethodAuthority() (gas: 371601)
+HyperspaceAuthorityTest:testProgramAuthority() (gas: 239079)
 TestEnvironment:testAttestation() (gas: 162100)
 TestEnvironment:testWithdrawal() (gas: 309897)
 InputValidationTest:testFailInvalidCertClaimID() (gas: 27063)

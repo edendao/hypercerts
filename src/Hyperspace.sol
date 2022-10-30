@@ -4,7 +4,7 @@ pragma solidity ^0.8.17;
 import "solmate/auth/authorities/RolesAuthority.sol";
 import "solmate/tokens/ERC721.sol";
 
-contract Domain is ERC721 {
+contract Hyperspace is ERC721 {
     constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) {}
 
     mapping(uint256 => string) internal _tokenURI;
@@ -13,12 +13,12 @@ contract Domain is ERC721 {
 
     function canCall(
         address user,
-        uint256 domainId,
+        uint256 hyperspaceId,
         bytes4 functionSig
     ) public view virtual returns (bool) {
         return
-            user == _ownerOf[domainId] ||
-            authorityOf[domainId].canCall(user, msg.sender, functionSig);
+            user == _ownerOf[hyperspaceId] ||
+            authorityOf[hyperspaceId].canCall(user, msg.sender, functionSig);
     }
 
     event AuthorityUpdated(uint256 indexed id, RolesAuthority authority);

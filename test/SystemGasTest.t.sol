@@ -4,27 +4,12 @@ pragma solidity ^0.8.17;
 import "./TestEnvironment.sol";
 
 contract SystemGasTest is TestEnvironment {
-    function testProgramCreateGas() public {
-        programs.create("ipfs://program-2-metadata");
-    }
-
-    function testClaimAttestGas() public {
-        claims.attest(
-            abi.encode(
-                block.timestamp,
-                block.timestamp + 7 days,
-                "ipfs://new-claim-metadata",
-                programId
-            )
-        );
-    }
-
-    function testMethodologyCreateGas() public {
-        methods.create("ipfs://methodology-2-metadata");
+    function testHyperspaceCreateGas() public {
+        hyperspaces.create("ipfs://methodology-2-metadata");
     }
 
     function testCertAttestGas() public {
-        evals.attest(
+        certs.attest(
             abi.encode(
                 block.timestamp + 1 weeks,
                 block.timestamp + 5 weeks,
@@ -37,6 +22,6 @@ contract SystemGasTest is TestEnvironment {
     }
 
     function testCertWithdrawGas() public {
-        evals.withdraw(evalId);
+        certs.withdraw(evalId);
     }
 }

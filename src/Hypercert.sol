@@ -1,21 +1,19 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.17;
 
-import "solmate/tokens/ERC721.sol";
+import "solmate/tokens/ERC1155.sol";
 
 import "./interfaces/IAttestation.sol";
-import "./Domain.sol";
-import "./Claim.sol";
+import "./Hyperspace.sol";
 
-contract Hypercert is ERC721, IAttestation {
-    Domain public immutable domains;
+contract Hypercert is ERC1155, IAttestation {
+    string public constant name = "HYPERCERTS";
+    string public constant symbol = "HYPR";
 
-    constructor(
-        string memory _name,
-        string memory _symbol,
-        address _domains
-    ) ERC721(_name, _symbol) {
-        domains = Domain(_domains);
+    Hyperspace public immutable hyperspaces;
+
+    constructor(address _hyperspaces) {
+        hyperspaces = Hyperspace(_hyperspaces);
     }
 
     function version() public pure virtual override returns (uint16) {
@@ -29,24 +27,20 @@ contract Hypercert is ERC721, IAttestation {
         uint64 endTime;
         uint128 value;
         uint256 linkedId;
-        uint256 domainId;
-        string uri;
+        uint256 hyperspaceId;
+        bytes uri;
     }
 
     mapping(uint256 => Metadata) public metadataOf;
 
-    function exists(uint256 id) public view virtual override returns (bool) {
-        return _ownerOf[id] != address(0);
-    }
-
-    function tokenURI(uint256 id) public view virtual override returns (string memory) {
-        require(exists(id), "NOT_MINTED");
-        return metadataOf[id].uri;
+    function uri(uint256 id) public view virtual override returns (string memory) {
+        require(metadataOf[id].agent != address(0), "NOT_MINTED");
+        return string(metadataOf[id].uri);
     }
 
     event Attestation(
         address indexed agent,
-        uint256 indexed domainId,
+        uint256 indexed hyperspaceId,
         uint256 indexed linkedId,
         uint256 hypercertId,
         uint128 value,
@@ -64,20 +58,19 @@ contract Hypercert is ERC721, IAttestation {
             uint64 startTime,
             uint64 endTime,
             uint128 value,
-            string memory uri,
+            bytes memory certURI,
             uint256 linkedId,
-            uint256 domainId
-        ) = abi.decode(data, (uint64, uint64, uint128, string, uint256, uint256));
+            uint256 hyperspaceId
+        ) = abi.decode(data, (uint64, uint64, uint128, bytes, uint256, uint256));
 
         require(startTime < endTime, "INVALID_TIMEFRAME");
-        require(bytes(uri).length > 0, "INVALID_URI");
+        require(certURI.length > 0, "INVALID_URI");
+        require(hyperspaces.canCall(msg.sender, hyperspaceId, msg.sig), "UNAUTHORIZED");
 
-        require(linkedId == 0 || exists(linkedId), "INVALID_SUBJECT");
-        require(domains.canCall(msg.sender, domainId, msg.sig), "UNAUTHORIZED");
-
-        hypercertId = uint256(keccak256(bytes(uri)));
-        _mint(msg.sender, hypercertId);
-        emit Attestation(msg.sender, domainId, linkedId, hypercertId, value, uri);
+        hypercertId = uint256(keccak256(certURI));
+        _mint(msg.sender, hypercertId, 1, certURI);
+        emit Attestation(msg.sender, hyperspaceId, linkedId, hypercertId, value, string(certURI));
+        emit URI(string(certURI), hypercertId);
 
         Metadata storage c = metadataOf[hypercertId];
         c.version = version();
@@ -85,24 +78,25 @@ contract Hypercert is ERC721, IAttestation {
         c.startTime = startTime;
         c.endTime = endTime;
         c.value = value;
-        c.domainId = domainId;
+        c.hyperspaceId = hyperspaceId;
         c.linkedId = linkedId;
-        c.uri = uri;
+        c.uri = certURI;
     }
 
     event Withdrawn(
         address indexed agent,
-        uint256 indexed domainId,
+        uint256 indexed hyperspaceId,
         uint256 indexed linkedId,
         uint256
     );
 
     function withdraw(uint256 hypercertId) public payable virtual override {
         Metadata storage c = metadataOf[hypercertId];
-        require(domains.canCall(msg.sender, c.domainId, msg.sig), "UNAUTHORIZED");
+        require(hyperspaces.canCall(msg.sender, c.hyperspaceId, msg.sig), "UNAUTHORIZED");
 
-        _burn(hypercertId);
-        emit Withdrawn(msg.sender, c.domainId, c.linkedId, hypercertId);
+        _burn(msg.sender, hypercertId, 1);
+        emit Withdrawn(msg.sender, c.hyperspaceId, c.linkedId, hypercertId);
+        emit URI("", hypercertId);
 
         delete metadataOf[hypercertId];
     }
