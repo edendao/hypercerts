@@ -73,6 +73,8 @@ contract Hypercert is ERC1155, IAttestation {
         emit URI(string(certURI), hypercertId);
 
         Metadata storage c = metadataOf[hypercertId];
+        require(c.agent == address(0), "ALREADY_MINTED");
+
         c.version = version();
         c.agent = msg.sender;
         c.startTime = startTime;
@@ -87,7 +89,7 @@ contract Hypercert is ERC1155, IAttestation {
         address indexed agent,
         uint256 indexed hyperspaceId,
         uint256 indexed linkedId,
-        uint256
+        uint256 hypercertId
     );
 
     function withdraw(uint256 hypercertId) public payable virtual override {

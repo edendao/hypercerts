@@ -17,6 +17,10 @@ contract HypercertTest is TestEnvironment {
     }
 
     function testWithdrawal() public {
+        claimId = certs.attest(
+            abi.encode(startTime, endTime, 0, "ipfs://test-claim-metadata", 0, programId)
+        );
         certs.withdraw(claimId);
+        assertEq(certs.balanceOf(self, claimId), 0);
     }
 }
