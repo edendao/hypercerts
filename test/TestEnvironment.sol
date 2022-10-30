@@ -3,17 +3,17 @@ pragma solidity ^0.8.17;
 
 import {Test} from "forge-std/Test.sol";
 
-import "src/Domain.sol";
+import "src/Group.sol";
 import "src/Claim.sol";
 import "src/Evaluation.sol";
 
 contract TestEnvironment is Test {
     address self = address(this);
 
-    Domain programs = new Domain("Impact Program", "iPROGRAM");
+    Group programs = new Group("Impact Program", "iPROGRAM");
     Claim claims = new Claim("Impact Claim", "iCLAIM", address(programs));
 
-    Domain methods = new Domain("Impact Methodology", "iMETHOD");
+    Group methods = new Group("Impact Methodology", "iMETHOD");
     Evaluation evals =
         new Evaluation("Impact Evaluation", "iCERTIFY", address(claims), address(methods));
 

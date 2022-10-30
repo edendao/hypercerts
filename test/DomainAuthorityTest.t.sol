@@ -3,7 +3,7 @@ pragma solidity ^0.8.17;
 
 import "./TestEnvironment.sol";
 
-contract DomainAuthorityTest is TestEnvironment {
+contract GroupAuthorityTest is TestEnvironment {
     function testProgramAuthority() public {
         assertEq(address(programs.authorityOf(programId)), address(programAuthority));
         address programUser = makeAddr("programUser");

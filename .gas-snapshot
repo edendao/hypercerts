@@ -1,5 +1,5 @@
-DomainAuthorityTest:testMethodAuthority() (gas: 371601)
-DomainAuthorityTest:testProgramAuthority() (gas: 239079)
+GroupAuthorityTest:testMethodAuthority() (gas: 371601)
+GroupAuthorityTest:testProgramAuthority() (gas: 239079)
 InputValidationTest:testFailInvalidCertClaimID() (gas: 27063)
 InputValidationTest:testFailInvalidCertDuplicateURIs() (gas: 8753)
 InputValidationTest:testFailInvalidCertMethodId() (gas: 24205)

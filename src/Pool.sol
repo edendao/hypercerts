@@ -4,16 +4,16 @@ pragma solidity ^0.8.17;
 import "solmate/tokens/ERC20.sol";
 
 import "./Evaluation.sol";
-import "./Domain.sol";
+import "./Group.sol";
 
 contract Pool is ERC20 {
     bool private _reentrancyGuard;
     uint16 public constant version = 1;
     uint64 public immutable startTime;
     uint64 public immutable endTime;
-    uint256 public immutable domainId;
+    uint256 public immutable groupId;
 
-    Domain public immutable domain;
+    Group public immutable group;
     Claim public immutable claims;
     Evaluation public immutable evaluations;
 
@@ -22,16 +22,16 @@ contract Pool is ERC20 {
         string memory _symbol,
         uint64 _startTime,
         uint64 _endTime,
-        uint256 _domainId,
+        uint256 _groupId,
         address _evaluations
     ) ERC20(_name, _symbol, 18) {
         startTime = _startTime;
         endTime = _endTime;
-        domainId = _domainId;
+        groupId = _groupId;
 
         evaluations = Evaluation(_evaluations);
         claims = evaluations.claims();
-        domain = evaluations.domain();
+        group = evaluations.group();
     }
 
     modifier nonReentrant() {
@@ -49,11 +49,11 @@ contract Pool is ERC20 {
             uint64 evalEndTime,
             uint128 evalValue,
             uint256 evalClaimId,
-            uint256 evalDomainId,
+            uint256 evalGroupId,
 
         ) = evaluations.metadataOf(evaluationId);
         require(version == evalVersion, "INVALID_VERSION");
-        require(domainId == evalDomainId, "INVALID_DOMAIN");
+        require(groupId == evalGroupId, "INVALID_GROUP");
         require(startTime <= evalStartTime && evalEndTime <= endTime, "INVALID_TIMEFRAME");
 
         _mint(account, uint256(evalValue));
