@@ -1,7 +1,5 @@
 DomainAuthorityTest:testMethodAuthority() (gas: 371601)
 DomainAuthorityTest:testProgramAuthority() (gas: 239079)
-TestEnvironment:testAttestation() (gas: 162100)
-TestEnvironment:testWithdrawal() (gas: 309897)
 InputValidationTest:testFailInvalidCertClaimID() (gas: 27063)
 InputValidationTest:testFailInvalidCertDuplicateURIs() (gas: 8753)
 InputValidationTest:testFailInvalidCertMethodId() (gas: 24205)
