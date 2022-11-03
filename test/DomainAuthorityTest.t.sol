@@ -36,9 +36,7 @@ contract GroupAuthorityTest is TestEnvironment {
 
     function testMethodAuthority() public {
         assertEq(address(methods.authorityOf(methodId)), address(methodAuthority));
-        uint256 claimId = claims.attest(
-            abi.encode(startTime, endTime, "ipfs://claim-metadata", programId)
-        );
+        claimId = claims.attest(abi.encode(startTime, endTime, "ipfs://claim-metadata", programId));
         address methodUser = makeAddr("methodUser");
 
         changePrank(methodUser);
@@ -53,19 +51,19 @@ contract GroupAuthorityTest is TestEnvironment {
         r.setUserRole(methodUser, 0, true);
 
         changePrank(methodUser);
-        uint256 id = evals.attest(
+        evalId = evals.attest(
             abi.encode(startTime, endTime, 42 ether, "ipfs://eval-metadata", claimId, methodId)
         );
-        assertTrue(evals.exists(id));
+        assertTrue(evals.exists(evalId));
 
         vm.expectRevert("UNAUTHORIZED");
-        evals.withdraw(id);
+        evals.withdraw(evalId);
 
         changePrank(self);
         r.setRoleCapability(0, address(evals), evals.withdraw.selector, true);
 
         changePrank(methodUser);
-        evals.withdraw(id);
-        assertFalse(evals.exists(id));
+        evals.withdraw(evalId);
+        assertFalse(evals.exists(evalId));
     }
 }

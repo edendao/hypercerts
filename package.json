@@ -1,14 +1,14 @@
 {
-  "name": "foundry-template",
-  "license": "MIT",
+  "name": "hypercerts",
+  "license": "UNLICENSE",
   "version": "1.0.0",
-  "description": "Streamlined template for getting started with Foundry and Solmate.",
+  "description": "",
   "files": [
     "src/**/*.sol"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/transmissions11/foundry-template.git"
+    "url": "git+https://github.com/edendao/hypercerts.git"
   },
   "devDependencies": {
     "prettier": "^2.3.1",
